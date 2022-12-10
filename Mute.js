@@ -1,6 +1,3 @@
-//LiteLoaderScript Dev Helper
-/// <reference path="c:\Users\yang\Desktop\VSCode/dts/HelperLib-master/src/index.d.ts"/> 
-
 ll.registerPlugin("Mute", "禁言插件",
 { "major": 1, "minor": 4, "revision": 0 }, {});
 
