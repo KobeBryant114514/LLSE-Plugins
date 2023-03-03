@@ -12,11 +12,59 @@
 ll.registerPlugin(
     "LLSECheckBag",
     "可查所有玩家背包的查包插件",
-    [2,1,0],
+    [2,2,2],
     {}
 ); 
 
-const Version = "2.1.0";
+const Version = "2.2.2";
+const langpath = "./plugins/LLSECheckBag/language.json";   //语言文件路径
+const defaultlanguage = JSON.stringify({               //默认语言文件
+    "command.description":"查询玩家背包",
+    "command.playeronly":"该命令只能由玩家执行！",
+    "command.checkonlineplayers":"查询在线玩家背包",
+    "command.checkallllayers":"查询全部玩家背包",
+    "command.error":"你没有权限执行此命令！",
+    "command.select.mode":"请选择查询模式",
+    "command.search.players.queries":"搜索玩家并查询",
+    "command.select.query.players":"请选择你要查询的玩家",
+    "command.recover.backpack":"恢复上一次查包前背包",
+    "command.view.target.backpack":"将玩家背包复制到自身背包",
+    "command.cover.target.backpack":"用自身背包覆盖玩家背包",
+    "command.checkplayer.sbtitle":"已选择玩家 {1}请选择你要进行的操作",           //引入变量部分
+    "command.search.players":"搜索玩家",
+    "command.delete.all.target.data":"删除玩家全部数据",
+    "command.operation.succeeded":"§l§e[LLSECheckBag] §r§b操作成功",
+    "command.operation.failed":"操作失败",
+    "command.unable.to.query.yourself":"§l§e[LLSECheckBag] §r§c自己查自己好玩吗？",
+    "command.search.complete.please.select":"搜索结果如下请选择你要查询的玩家",
+    "command.please.enter.content":"请输入内容",
+    "command.target.loss":"§l§e[LLSECheckBag] §r§c目标玩家已离线，请使用查询全部玩家来查询离线玩家背包",
+    "command.confirm.override":"你确定要覆盖玩家 {1} 的背包吗？",
+    "command.confirm.target.deletion":"你确定要删除玩家 {1} 的全部数据吗？",
+    "command.confirm":"确认",
+    "command.no":"我再想想",
+    "command.target.online.deletion.failed":"§l§e[LLSECheckBag] §r§c操作失败！目标玩家在线，无法删除数据！",
+    "error.no.data":"§l§e[LLSECheckBag] §r§c无上次背包数据",
+    "error.re.enter":"重新输入",
+    "error.please.enter.the.content":"你没有输入任何内容请重新输入！",
+    "command.quitcheckbag":"退出查包",
+    "error.query.yielded.no.results":"没有找到与你输入结果匹配的玩家！",
+    "command.query.by.name":"输入玩家名来搜索并查询玩家背包",
+    "command.enter.name":"你要查询的玩家的真实名字",
+    "command.please.select.a.search.mode":"请选择搜索模式",
+    "command.fuzzy.search":"模糊搜索",
+    "command.precise.search":"精准搜索",
+    "data.notfound":"§l§e[LLSECheckBag] §r§c目标玩家没有数据"
+})
+const lang = data.openConfig(langpath, "json", defaultlanguage);    //打开语言文件
+
+function tr(string) { 
+    let Str = lang.get(string);           //读取语言
+    if (Str != undefined) {
+        return Str;
+    }
+    else return "Language File Not Found! \nPlease delete old language file and restart to generate a new one."
+}
 
 if (File.exists("./plugins/LLSECheckBag/data.json")) {                  //旧的数据库已弃用，删除数据库。
     File.delete("./plugins/LLSECheckBag/data.json");
@@ -26,12 +74,12 @@ logger.info("加载成功，作者： Tsubasa6848、铭记mingji");
 logger.info("当前版本： " + Version);
 
 mc.listen("onServerStarted", () => {                                           
-    let cmd = mc.newCommand("checkbag", "查询玩家背包", PermType.GameMasters);  
+    let cmd = mc.newCommand("checkbag", tr("command.description"), PermType.GameMasters);  
     cmd.setAlias("cb");                                                        
     cmd.overload();                                                          
     cmd.setCallback((cmd, ori, out, res) => {
         if (ori.player == null) {                                         
-            return out.error("该命令只能由玩家执行！");
+            return out.error(tr("command.playeronly"));
         }
         else {
             if (ori.player.isOP()) {                       //再次验证，防execute绕过权限组
@@ -39,7 +87,7 @@ mc.listen("onServerStarted", () => {
                 return;
             }
             else {
-                return out.error("你没有权限执行此命令！");
+                return out.error(tr("command.error"));
             }                                                        
         }
     });
@@ -48,12 +96,12 @@ mc.listen("onServerStarted", () => {
 
 function CheckBagForm(pl) {      
     let fm = mc.newSimpleForm();
-    fm.setTitle(`查询玩家背包`);
-    fm.setContent(`请选择查询模式`);
-    fm.addButton(`查询在线玩家`);
-    fm.addButton(`查询全部玩家`);
-    fm.addButton(`搜索玩家并查询`);
-    fm.addButton(`恢复上一次查包前背包`);
+    fm.setTitle(tr("command.description"));
+    fm.setContent(tr("command.select.mode"));
+    fm.addButton(tr("command.checkonlineplayers"));
+    fm.addButton(tr("command.checkallllayers"));
+    fm.addButton(tr("command.search.players.queries"));
+    fm.addButton(tr("command.recover.backpack"));
     pl.sendForm(fm, (pl, id) => {
         switch (id) {
             case 0:
@@ -66,7 +114,7 @@ function CheckBagForm(pl) {
                 SearchForm(pl);
                 break;
             case 3:
-                ResumeBag(pl); 
+                ResumeBag(pl, true); 
                 break;
             default:
                 break;
@@ -77,8 +125,8 @@ function CheckBagForm(pl) {
 function CheckAllPlayers(pl) { 
     let fm = mc.newSimpleForm();
     let pldata = data.getAllPlayerInfo();
-    fm.setTitle(`查询全部玩家背包`);
-    fm.setContent(`请选择你要查询的玩家`)
+    fm.setTitle(tr("command.checkallllayers"));
+    fm.setContent(tr("command.select.query.players"))
     pldata.forEach((player) => {
         fm.addButton(player.name); 
     });
@@ -88,7 +136,7 @@ function CheckAllPlayers(pl) {
         }
         else {
             if (pldata[arg].uuid == pl.uuid) {
-                pl.tell(`§l§e[LLSECheckBag] §r§c自己查自己好玩吗？`);
+                pl.tell(tr("command.unable.to.query.yourself"));
                 return;
             }
             CheckPlayer(pl, pldata[arg]); 
@@ -99,8 +147,8 @@ function CheckAllPlayers(pl) {
 
 function CheckOnlinePlayers(pl) {
     let fm = mc.newSimpleForm();
-    fm.setTitle(`查询在线玩家背包`);
-    fm.setContent(`请选择你要查询的玩家`)
+    fm.setTitle(tr("command.checkonlineplayers"));
+    fm.setContent(tr("command.select.query.players"))
     let OnlinePlayers = mc.getOnlinePlayers();
     OnlinePlayers.forEach((player) => {
         fm.addButton(player.realName);
@@ -111,14 +159,14 @@ function CheckOnlinePlayers(pl) {
         }
         else {
             if (OnlinePlayers[arg].uuid == pl.uuid) {
-                pl.tell(`§l§e[LLSECheckBag] §r§c自己查自己好玩吗？`);
+                pl.tell(tr("command.unable.to.query.yourself"));
                 return;
             }
             if (OnlinePlayers[arg].uuid != undefined) {
                 CheckPlayer(pl, SearchData(OnlinePlayers[arg]));
             }
             else {
-                pl.tell(`§l§e[LLSECheckBag] §r§c目标玩家已离线，请使用查询全部玩家来查询离线玩家背包。`);
+                pl.tell(tr("command.target.loss"));
             }
             return;
         }
@@ -136,18 +184,18 @@ function SearchData(pl) {
 
 function CheckPlayer(pl, pldt) {    
     let fm = mc.newSimpleForm();
-    fm.setTitle(`查询玩家背包`);
-    fm.setContent(`已选择玩家 ${pldt.name}\n请选择你要进行的操作`)
-    fm.addButton(`将玩家背包复制到自身背包`);  
-    fm.addButton(`用自身背包覆盖玩家背包`); 
-    fm.addButton(`删除玩家全部数据`); 
+    fm.setTitle(tr("command.description"));
+    fm.setContent(tr("command.checkplayer.sbtitle").replace("{1}", pldt.name))
+    fm.addButton(tr("command.view.target.backpack"));  
+    fm.addButton(tr("command.cover.target.backpack")); 
+    fm.addButton(tr("command.delete.all.target.data")); 
     pl.sendForm(fm, (pl, arg) => {
         switch (arg) {
             case 0:
                 CopyBag(pl, pldt);
                 break;
             case 1:
-                pl.sendModalForm("覆盖玩家背包",`你确定要覆盖玩家 ${pldt.name} 的背包吗？\n\n本操作不可撤销！`,"确认覆盖","我再想想",(pl,arg) => {
+                pl.sendModalForm(tr("command.cover.target.backpack"),tr("command.confirm.override").replace("{1}", pldt.name),tr("command.confirm"),tr("command.no"),(pl,arg) => {
                     if (arg == 1) {
                         WriteBag(pl, pldt); 
                     }
@@ -157,14 +205,19 @@ function CheckPlayer(pl, pldt) {
                 });
                 break;
             case 2:
-                pl.sendModalForm("删除玩家全部数据",`你确定要删除玩家 ${pldt.name} 的全部数据吗？\n本操作不可撤销！`,"确认删除","我再想想",(pl,arg) => {
+                pl.sendModalForm(tr("command.delete.all.target.data"),tr("command.confirm.target.deletion").replace("{1}", pldt.name),tr("command.confirm"),tr("command.no"),(pl,arg) => {
                     if (arg == 1) {
+                        let plnbt = mc.getPlayerNbt(pldt.uuid);
+                        if (plnbt == null) {
+                            pl.tell(tr("data.notfound"));
+                            return;
+                        }
                         if (mc.getPlayer(pldt.xuid) == null) {
                             mc.deletePlayerNbt(pldt.uuid);
-                            pl.tell("§l§e[LLSECheckBag] §r§a操作成功！");
+                            pl.tell(tr("command.operation.succeeded"));
                         }
                         else {
-                            pl.tell("§l§e[LLSECheckBag] §r§c操作失败！目标玩家在线，无法删除数据！");
+                            pl.tell(tr("command.target.online.deletion.failed"));
                             CheckBagForm(pl);
                         }
                     }
@@ -185,36 +238,48 @@ function SaveBag(pl) {
     File.writeTo(`./plugins/LLSECheckBag/db/${pl.uuid}`, plsnbt);
 }
 
-function CopyBag(pl, pldt) {
+function CopyBag(pl, pldt) {  
+    if (File.exists(`./plugins/LLSECheckBag/db/${pl.uuid}`)) {
+        ResumeBag(pl, false);
+    }
     SaveBag(pl);
     let plnbt = mc.getPlayerNbt(pldt.uuid);
+    if (plnbt == null) {
+        pl.tell(tr("data.notfound"));
+        return;
+    } 
     mc.setPlayerNbtTags(pl.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
-    pl.tell("§l§e[LLSECheckBag] §r§a操作成功！");
+    pl.tell(tr("command.operation.succeeded"));
 }
 
 function WriteBag(pl, pldt) {
     let plnbt = mc.getPlayerNbt(pl.uuid);
+    if (mc.getPlayerNbt(pldt.uuid) == null) {
+        pl.tell(tr("data.notfound"));
+        return;
+    } 
     mc.setPlayerNbtTags(pldt.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
-    pl.tell("§l§e[LLSECheckBag] §r§a操作成功！");
+    pl.tell(tr("command.operation.succeeded"));
 }
 
-function ResumeBag(pl) {
+function ResumeBag(pl, lg) {
     let plsnbt = File.readFrom(`./plugins/LLSECheckBag/db/${pl.uuid}`);
-    if (plsnbt == null) {
-        pl.tell(`§l§e[LLSECheckBag] §r§c无上次背包数据`);
+    if (plsnbt == undefined && lg == true) {
+        pl.tell(tr("error.no.data"));
     }
     else {
         let plnbt = NBT.parseSNBT(plsnbt);
         mc.setPlayerNbtTags(pl.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
+        File.delete(`./plugins/LLSECheckBag/db/${pl.uuid}`);
     }
 }
 
 function SearchForm(pl) {
     let fm = mc.newCustomForm();
-    fm.setTitle(`搜索玩家`);
-    fm.addLabel(`输入玩家名来搜索并查询玩家背包`);
-    fm.addInput(`你要查询的玩家的真实名字`, `请输入玩家真实名字`);
-    fm.addDropdown(`请选择搜索模式`, ["模糊搜索", "精准搜索"], 0);
+    fm.setTitle(tr("command.search.players"));
+    fm.addLabel(tr("command.search.players.queries"));
+    fm.addInput(tr("command.enter.name"), tr("command.please.enter.content"));
+    fm.addDropdown(tr("command.please.select.a.search.mode"), [tr("command.fuzzy.search"), tr("command.precise.search")], 0);
     pl.sendForm(fm, (pl, arg) => {
         if (arg == null) {
             CheckBagForm(pl);
@@ -224,14 +289,14 @@ function SearchForm(pl) {
             case 0:
                 let list = GenSearchList(arg[1]);
                 if (arg[1] == "") {
-                    pl.sendModalForm("请输入内容",`你没有输入任何内容！\n请重新输入！`,"重新输入","退出查包",(pl,arg) => {
+                    pl.sendModalForm(tr("command.please.enter.content"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
                     });
                 }
                 else if (list.length == 0) {
-                    pl.sendModalForm("没有找到匹配的玩家",`没有找到与你输入结果匹配的玩家！`,"重新输入","退出查包",(pl,arg) => {
+                    pl.sendModalForm(tr("error.query.yielded.no.results"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
@@ -243,14 +308,14 @@ function SearchForm(pl) {
                 break;
             case 1:
                 if (arg[1] == "") {
-                    pl.sendModalForm("请输入内容",`你没有输入任何内容！\n请重新输入！`,"重新输入","退出查包",(pl,arg) => {
+                    pl.sendModalForm(tr("command.please.enter.content"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
                     });
                 }
                 else if (GetDB(arg[1]) == null) {
-                    pl.sendModalForm("玩家不存在",`你要查询的玩家 ${arg[1]} 不存在！\n\n请确保你输入了正确的玩家真实名字并确保大小写正确！`,"重新输入","退出查包",(pl,arg) => {
+                    pl.sendModalForm(tr("command.operation.failed"),tr("error.query.yielded.no.results"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
@@ -291,8 +356,8 @@ function GenSearchList(key) {
 
 function SearchListForm(pl, pldata) {
     let fm = mc.newSimpleForm();
-    fm.setTitle(`查询全部玩家背包`);
-    fm.setContent(`搜索结果如下\n请选择你要查询的玩家`)
+    fm.setTitle(tr("command.checkallllayers"));
+    fm.setContent(tr("command.search.complete.please.select"))
     pldata.forEach((player) => {
         fm.addButton(player.name);
     });
@@ -302,7 +367,7 @@ function SearchListForm(pl, pldata) {
         }
         else {
             if (pldata[arg].uuid == pl.uuid) {
-                pl.tell(`§l§e[LLSECheckBag] §r§c自己查自己好玩吗？`);
+                pl.tell(tr("command.unable.to.query.yourself"));
                 return;
             }
             CheckPlayer(pl, pldata[arg]);
