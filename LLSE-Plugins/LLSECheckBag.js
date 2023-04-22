@@ -124,7 +124,7 @@ function CheckBagForm(pl) {
                 SearchForm(pl);
                 break;
             case 3:
-                ResumeBag(pl, pl, true);
+                ResumeBag(pl, true);
                 break;
             default:
                 break;
@@ -156,13 +156,16 @@ function Page(pl, page = 0) {
         }
         if (arg == 0 && page > 0) {
             Page(pl, page - 1);
-        } else if (arg == pageSize + (page > 0 ? 1 : 0) && startindex + pageSize < players.length) {
+        }
+        else if (arg == pageSize + (page > 0 ? 1 : 0) && startindex + pageSize < players.length) {
             Page(pl, page + 1);
-        } else {
+        }
+        else {
             const player2 = players[startindex + arg - (page > 0 ? 1 : 0)];
             if (player2) {
                 CheckPlayer(player, player2);
-            } else {
+            }
+            else {
                 player.tell(tr("command.operation.failed"));
             }
         }
@@ -276,7 +279,7 @@ function CheckPlayer(pl, pldt) {
                 });
                 break;
             case 3:
-                ResumeBag(pl, pldt, true);
+                ResumeBag(pl, true, pldt);
                 break;
             default:
                 CheckBagForm(pl);
@@ -292,7 +295,7 @@ function SaveBag(pl) {
 
 function CopyBag(pl, pldt) {
     if (File.exists(`./plugins/LLSECheckBag/db/${pl.uuid}.json`)) {
-        ResumeBag(pl, pl, false);
+        ResumeBag(pl, false);
     }
     SaveBag(pl);
     let plnbt = mc.getPlayerNbt(pldt.uuid);
@@ -314,7 +317,7 @@ function WriteBag(pl, pldt) {
     pl.tell(tr("command.operation.succeeded"));
 }
 
-function ResumeBag(pl, pldt, lg) {
+function ResumeBag(pl, lg, pldt) {
     let pldtsnbt = File.readFrom(`./plugins/LLSECheckBag/db/${pldt.uuid}.json`);
     if (pldtsnbt == undefined && lg == true) {
         pl.tell(tr("error.no.data"));
