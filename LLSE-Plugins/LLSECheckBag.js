@@ -12,53 +12,64 @@
 ll.registerPlugin(
     "LLSECheckBag",
     "可查所有玩家背包的查包插件",
-    [2,2,2],
+    [2, 3, 0],
     {}
-); 
+);
 
-const Version = "2.2.2";
+const Version = "2.3.0";
 const langpath = "./plugins/LLSECheckBag/language.json";   //语言文件路径
+const configpath = "./plugins/LLSECheckBag/config.json";   //语言文件路径
 const defaultlanguage = JSON.stringify({               //默认语言文件
-    "command.description":"查询玩家背包",
-    "command.playeronly":"该命令只能由玩家执行！",
-    "command.checkonlineplayers":"查询在线玩家背包",
-    "command.checkallllayers":"查询全部玩家背包",
-    "command.error":"你没有权限执行此命令！",
-    "command.select.mode":"请选择查询模式",
-    "command.search.players.queries":"搜索玩家并查询",
-    "command.select.query.players":"请选择你要查询的玩家",
-    "command.recover.backpack":"恢复上一次查包前背包",
-    "command.view.target.backpack":"将玩家背包复制到自身背包",
-    "command.cover.target.backpack":"用自身背包覆盖玩家背包",
-    "command.checkplayer.sbtitle":"已选择玩家 {1}请选择你要进行的操作",           //引入变量部分
-    "command.search.players":"搜索玩家",
-    "command.delete.all.target.data":"删除玩家全部数据",
-    "command.operation.succeeded":"§l§e[LLSECheckBag] §r§b操作成功",
-    "command.operation.failed":"操作失败",
-    "command.unable.to.query.yourself":"§l§e[LLSECheckBag] §r§c自己查自己好玩吗？",
-    "command.search.complete.please.select":"搜索结果如下请选择你要查询的玩家",
-    "command.please.enter.content":"请输入内容",
-    "command.target.loss":"§l§e[LLSECheckBag] §r§c目标玩家已离线，请使用查询全部玩家来查询离线玩家背包",
-    "command.confirm.override":"你确定要覆盖玩家 {1} 的背包吗？",
-    "command.confirm.target.deletion":"你确定要删除玩家 {1} 的全部数据吗？",
-    "command.confirm":"确认",
-    "command.no":"我再想想",
-    "command.target.online.deletion.failed":"§l§e[LLSECheckBag] §r§c操作失败！目标玩家在线，无法删除数据！",
-    "error.no.data":"§l§e[LLSECheckBag] §r§c无上次背包数据",
-    "error.re.enter":"重新输入",
-    "error.please.enter.the.content":"你没有输入任何内容请重新输入！",
-    "command.quitcheckbag":"退出查包",
-    "error.query.yielded.no.results":"没有找到与你输入结果匹配的玩家！",
-    "command.query.by.name":"输入玩家名来搜索并查询玩家背包",
-    "command.enter.name":"你要查询的玩家的真实名字",
-    "command.please.select.a.search.mode":"请选择搜索模式",
-    "command.fuzzy.search":"模糊搜索",
-    "command.precise.search":"精准搜索",
-    "data.notfound":"§l§e[LLSECheckBag] §r§c目标玩家没有数据"
+    "command.description": "查询玩家背包",
+    "command.playeronly": "该命令只能由玩家执行！",
+    "command.checkonlineplayers": "查询在线玩家背包",
+    "command.checkallllayers": "查询全部玩家背包",
+    "command.error": "你没有权限执行此命令！",
+    "command.select.mode": "请选择查询模式",
+    "command.search.players.queries": "搜索玩家并查询",
+    "command.select.query.players": "请选择你要查询的玩家",
+    "command.recover.backpack": "恢复上一次查包前背包",
+    "command.recover.target.data": "恢复玩家上一次备份数据",
+    "command.view.target.backpack": "将玩家背包复制到自身背包",
+    "command.cover.target.backpack": "用自身背包覆盖玩家背包",
+    "command.checkplayer.sbtitle": "已选择玩家 {1}请选择你要进行的操作",           //引入变量部分
+    "command.search.players": "搜索玩家",
+    "command.delete.all.target.data": "删除玩家全部数据",
+    "command.operation.succeeded": "§l§e[LLSECheckBag] §r§b操作成功",
+    "command.operation.failed": "操作失败",
+    "command.unable.to.query.yourself": "§l§e[LLSECheckBag] §r§c自己查自己好玩吗？",
+    "command.search.complete.please.select": "搜索结果如下请选择你要查询的玩家",
+    "command.please.enter.content": "请输入内容",
+    "command.target.loss": "§l§e[LLSECheckBag] §r§c目标玩家已离线，请使用查询全部玩家来查询离线玩家背包",
+    "command.confirm.override": "你确定要覆盖玩家 {1} 的背包吗？",
+    "command.confirm.target.deletion": "你确定要删除玩家 {1} 的全部数据吗？",
+    "command.confirm": "确认",
+    "command.no": "我再想想",
+    "page.next.page": "下一页",
+    "page.previous.page": "上一页",
+    "command.target.online.deletion.failed": "§l§e[LLSECheckBag] §r§c操作失败！目标玩家在线，无法删除数据！",
+    "error.no.data": "§l§e[LLSECheckBag] §r§c无上次背包数据",
+    "error.re.enter": "重新输入",
+    "error.please.enter.the.content": "你没有输入任何内容请重新输入！",
+    "command.quitcheckbag": "退出查包",
+    "error.query.yielded.no.results": "没有找到与你输入结果匹配的玩家！",
+    "command.query.by.name": "输入玩家名来搜索并查询玩家背包",
+    "command.enter.name": "你要查询的玩家的真实名字",
+    "command.please.select.a.search.mode": "请选择搜索模式",
+    "command.fuzzy.search": "模糊搜索",
+    "command.precise.search": "精准搜索",
+    "data.notfound": "§l§e[LLSECheckBag] §r§c目标玩家没有数据"
+})
+const defaultconfig = JSON.stringify({  //默认配置文件
+    "BackDataRetention": false,
+    "PageSize": 10,
+    "JoinSave": false,
+    "LeftSave": false
 })
 const lang = data.openConfig(langpath, "json", defaultlanguage);    //打开语言文件
-
-function tr(string) { 
+const config = data.openConfig(configpath, "json", defaultconfig);  //打开配置文件
+const backdataretention = config.get("BackDataRetention");
+function tr(string) {
     let Str = lang.get(string);           //读取语言
     if (Str != undefined) {
         return Str;
@@ -69,16 +80,15 @@ function tr(string) {
 if (File.exists("./plugins/LLSECheckBag/data.json")) {                  //旧的数据库已弃用，删除数据库。
     File.delete("./plugins/LLSECheckBag/data.json");
 };
-
 logger.info("加载成功，作者： Tsubasa6848、铭记mingji");
 logger.info("当前版本： " + Version);
 
-mc.listen("onServerStarted", () => {                                           
-    let cmd = mc.newCommand("checkbag", tr("command.description"), PermType.GameMasters);  
-    cmd.setAlias("cb");                                                        
-    cmd.overload();                                                          
+mc.listen("onServerStarted", () => {
+    let cmd = mc.newCommand("checkbag", tr("command.description"), PermType.GameMasters);
+    cmd.setAlias("cb");
+    cmd.overload();
     cmd.setCallback((cmd, ori, out, res) => {
-        if (ori.player == null) {                                         
+        if (ori.player == null) {
             return out.error(tr("command.playeronly"));
         }
         else {
@@ -88,13 +98,13 @@ mc.listen("onServerStarted", () => {
             }
             else {
                 return out.error(tr("command.error"));
-            }                                                        
+            }
         }
     });
-    cmd.setup();                                                            
+    cmd.setup();
 });
 
-function CheckBagForm(pl) {      
+function CheckBagForm(pl) {
     let fm = mc.newSimpleForm();
     fm.setTitle(tr("command.description"));
     fm.setContent(tr("command.select.mode"));
@@ -105,16 +115,16 @@ function CheckBagForm(pl) {
     pl.sendForm(fm, (pl, id) => {
         switch (id) {
             case 0:
-                CheckOnlinePlayers(pl); 
+                CheckOnlinePlayers(pl);
                 break;
             case 1:
-                CheckAllPlayers(pl);   
+                Page(pl);
                 break;
             case 2:
                 SearchForm(pl);
                 break;
             case 3:
-                ResumeBag(pl, true); 
+                ResumeBag(pl, true);
                 break;
             default:
                 break;
@@ -122,16 +132,57 @@ function CheckBagForm(pl) {
     });
 }
 
-function CheckAllPlayers(pl) { 
+function Page(pl, page = 0) {
+    const pageSize = config.get("PageSize");
+    const players = data.getAllPlayerInfo().filter(player => player.uuid !== pl.uuid);
+    const pageCount = Math.ceil(players.length / pageSize);
+    const startindex = page * pageSize;
+    const fm = mc.newSimpleForm()
+    fm.setTitle(tr("command.checkallllayers"))
+    fm.setContent(tr("command.select.query.players"));
+    if (page > 0) {
+        fm.addButton(tr("page.previous.page"));
+    }
+    for (let i = startindex; i < startindex + pageSize && i < players.length; i++) {
+        const player = players[i];
+        fm.addButton(player.name);
+    }
+    if (page < pageCount - 1) {
+        fm.addButton(tr("page.next.page"));
+    }
+    pl.sendForm(fm, (player, arg) => {
+        if (arg == null) {
+            return;
+        }
+        if (arg == 0 && page > 0) {
+            Page(pl, page - 1);
+        }
+        else if (arg == pageSize + (page > 0 ? 1 : 0) && startindex + pageSize < players.length) {
+            Page(pl, page + 1);
+        }
+        else {
+            const player2 = players[startindex + arg - (page > 0 ? 1 : 0)];
+            if (player2) {
+                CheckPlayer(player, player2);
+            }
+            else {
+                player.tell(tr("command.operation.failed"));
+            }
+        }
+    });
+}
+
+/*
+function CheckAllPlayers(pl) {
     let fm = mc.newSimpleForm();
     let pldata = data.getAllPlayerInfo();
     fm.setTitle(tr("command.checkallllayers"));
     fm.setContent(tr("command.select.query.players"))
     pldata.forEach((player) => {
-        fm.addButton(player.name); 
+        fm.addButton(player.name);
     });
     pl.sendForm(fm, (pl, arg) => {
-        if (arg == null) { 
+        if (arg == null) {
             CheckBagForm(pl);
         }
         else {
@@ -139,12 +190,12 @@ function CheckAllPlayers(pl) {
                 pl.tell(tr("command.unable.to.query.yourself"));
                 return;
             }
-            CheckPlayer(pl, pldata[arg]); 
+            CheckPlayer(pl, pldata[arg]);
             return;
         }
     });
 }
-
+*/
 function CheckOnlinePlayers(pl) {
     let fm = mc.newSimpleForm();
     fm.setTitle(tr("command.checkonlineplayers"));
@@ -175,29 +226,30 @@ function CheckOnlinePlayers(pl) {
 
 function SearchData(pl) {
     let pldata = data.getAllPlayerInfo();
-    for(let i in pldata) {
-        if (pl.uuid == pldata[i].uuid) { 
+    for (let i in pldata) {
+        if (pl.uuid == pldata[i].uuid) {
             return pldata[i];
         }
     }
 }
 
-function CheckPlayer(pl, pldt) {    
+function CheckPlayer(pl, pldt) {
     let fm = mc.newSimpleForm();
     fm.setTitle(tr("command.description"));
     fm.setContent(tr("command.checkplayer.sbtitle").replace("{1}", pldt.name))
-    fm.addButton(tr("command.view.target.backpack"));  
-    fm.addButton(tr("command.cover.target.backpack")); 
-    fm.addButton(tr("command.delete.all.target.data")); 
+    fm.addButton(tr("command.view.target.backpack"));
+    fm.addButton(tr("command.cover.target.backpack"));
+    fm.addButton(tr("command.delete.all.target.data"));
+    fm.addButton(tr("command.recover.target.data"));
     pl.sendForm(fm, (pl, arg) => {
         switch (arg) {
             case 0:
                 CopyBag(pl, pldt);
                 break;
             case 1:
-                pl.sendModalForm(tr("command.cover.target.backpack"),tr("command.confirm.override").replace("{1}", pldt.name),tr("command.confirm"),tr("command.no"),(pl,arg) => {
+                pl.sendModalForm(tr("command.cover.target.backpack"), tr("command.confirm.override").replace("{1}", pldt.name), tr("command.confirm"), tr("command.no"), (pl, arg) => {
                     if (arg == 1) {
-                        WriteBag(pl, pldt); 
+                        WriteBag(pl, pldt);
                     }
                     else {
                         CheckPlayer(pl, pldt);
@@ -205,7 +257,7 @@ function CheckPlayer(pl, pldt) {
                 });
                 break;
             case 2:
-                pl.sendModalForm(tr("command.delete.all.target.data"),tr("command.confirm.target.deletion").replace("{1}", pldt.name),tr("command.confirm"),tr("command.no"),(pl,arg) => {
+                pl.sendModalForm(tr("command.delete.all.target.data"), tr("command.confirm.target.deletion").replace("{1}", pldt.name), tr("command.confirm"), tr("command.no"), (pl, arg) => {
                     if (arg == 1) {
                         let plnbt = mc.getPlayerNbt(pldt.uuid);
                         if (plnbt == null) {
@@ -226,6 +278,9 @@ function CheckPlayer(pl, pldt) {
                     }
                 });
                 break;
+            case 3:
+                ResumeBag(pl, true, pldt);
+                break;
             default:
                 CheckBagForm(pl);
                 break;
@@ -234,12 +289,12 @@ function CheckPlayer(pl, pldt) {
 }
 
 function SaveBag(pl) {
-    let plsnbt = mc.getPlayerNbt(pl.uuid).toSNBT();
-    File.writeTo(`./plugins/LLSECheckBag/db/${pl.uuid}`, plsnbt);
+    let plsnbt = mc.getPlayerNbt(pl.uuid).toSNBT(1);
+    File.writeTo(`./plugins/LLSECheckBag/db/${pl.uuid}.json`, plsnbt);
 }
 
-function CopyBag(pl, pldt) {  
-    if (File.exists(`./plugins/LLSECheckBag/db/${pl.uuid}`)) {
+function CopyBag(pl, pldt) {
+    if (File.exists(`./plugins/LLSECheckBag/db/${pl.uuid}.json`)) {
         ResumeBag(pl, false);
     }
     SaveBag(pl);
@@ -247,7 +302,7 @@ function CopyBag(pl, pldt) {
     if (plnbt == null) {
         pl.tell(tr("data.notfound"));
         return;
-    } 
+    }
     mc.setPlayerNbtTags(pl.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
     pl.tell(tr("command.operation.succeeded"));
 }
@@ -257,20 +312,22 @@ function WriteBag(pl, pldt) {
     if (mc.getPlayerNbt(pldt.uuid) == null) {
         pl.tell(tr("data.notfound"));
         return;
-    } 
+    }
     mc.setPlayerNbtTags(pldt.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
     pl.tell(tr("command.operation.succeeded"));
 }
 
-function ResumeBag(pl, lg) {
-    let plsnbt = File.readFrom(`./plugins/LLSECheckBag/db/${pl.uuid}`);
-    if (plsnbt == undefined && lg == true) {
+function ResumeBag(pl, lg, pldt) {
+    let pldtsnbt = File.readFrom(`./plugins/LLSECheckBag/db/${pldt.uuid}.json`);
+    if (pldtsnbt == undefined && lg == true) {
         pl.tell(tr("error.no.data"));
     }
     else {
-        let plnbt = NBT.parseSNBT(plsnbt);
-        mc.setPlayerNbtTags(pl.uuid, plnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
-        File.delete(`./plugins/LLSECheckBag/db/${pl.uuid}`);
+        let pldtnbt = NBT.parseSNBT(pldtsnbt);
+        mc.setPlayerNbtTags(pldt.uuid, pldtnbt, ["Offhand", "Inventory", "Armor", "EnderChestInventory"]);
+        if (backdataretention != true) {
+            File.delete(`./plugins/LLSECheckBag/db/${pldt.uuid}.json`);
+        }
     }
 }
 
@@ -289,14 +346,14 @@ function SearchForm(pl) {
             case 0:
                 let list = GenSearchList(arg[1]);
                 if (arg[1] == "") {
-                    pl.sendModalForm(tr("command.please.enter.content"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
+                    pl.sendModalForm(tr("command.please.enter.content"), tr("error.please.enter.the.content"), tr("error.re.enter"), tr("command.quitcheckbag"), (pl, arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
                     });
                 }
                 else if (list.length == 0) {
-                    pl.sendModalForm(tr("error.query.yielded.no.results"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
+                    pl.sendModalForm(tr("error.query.yielded.no.results"), tr("error.please.enter.the.content"), tr("error.re.enter"), tr("command.quitcheckbag"), (pl, arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
@@ -308,14 +365,14 @@ function SearchForm(pl) {
                 break;
             case 1:
                 if (arg[1] == "") {
-                    pl.sendModalForm(tr("command.please.enter.content"),tr("error.please.enter.the.content"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
+                    pl.sendModalForm(tr("command.please.enter.content"), tr("error.please.enter.the.content"), tr("error.re.enter"), tr("command.quitcheckbag"), (pl, arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
                     });
                 }
                 else if (GetDB(arg[1]) == null) {
-                    pl.sendModalForm(tr("command.operation.failed"),tr("error.query.yielded.no.results"),tr("error.re.enter"),tr("command.quitcheckbag"),(pl,arg) => {
+                    pl.sendModalForm(tr("command.operation.failed"), tr("error.query.yielded.no.results"), tr("error.re.enter"), tr("command.quitcheckbag"), (pl, arg) => {
                         if (arg == 1) {
                             SearchForm(pl);
                         }
@@ -335,8 +392,8 @@ function SearchForm(pl) {
 
 function GetDB(realName) {
     let pldata = data.getAllPlayerInfo();
-    for(let i in pldata) {
-        if (realName == pldata[i].name) { 
+    for (let i in pldata) {
+        if (realName == pldata[i].name) {
             return pldata[i];
         }
     }
@@ -346,8 +403,8 @@ function GetDB(realName) {
 function GenSearchList(key) {
     let pldata = data.getAllPlayerInfo();
     let res = [];
-    for(let i in pldata) {
-        if (pldata[i].name.includes(key)) { 
+    for (let i in pldata) {
+        if (pldata[i].name.includes(key)) {
             res.push(pldata[i]);
         }
     }
@@ -375,3 +432,18 @@ function SearchListForm(pl, pldata) {
         }
     });
 }
+
+mc.listen("onJoin", (pl) => {
+    if (config.get("JoinSave") == true) {
+        if (pl.isSimulatedPlayer() != true) {
+            SaveBag(pl)
+        }
+    }
+})
+mc.listen("onLeft", (pl) => {
+    if (config.get("LeftSave") == true) {
+        if (pl.isSimulatedPlayer() != true) {
+            SaveBag(pl)
+        }
+    }
+})
